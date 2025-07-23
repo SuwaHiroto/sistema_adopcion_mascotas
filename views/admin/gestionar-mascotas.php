@@ -2,14 +2,12 @@
 // Iniciar sesión para poder usar variables de sesión para los mensajes
 session_start();
 
-include 'layouts/header_admin.php';
-
-
 // Incluir dependencias
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/MascotaModel.php';
 
 // --- LÓGICA DEL CONTROLADOR ---
+// Toda esta sección se ejecuta ANTES de enviar cualquier contenido HTML al navegador.
 
 $db = (new Database())->connect();
 $mascota = new Mascota($db);
@@ -64,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['message'] = ['text' => 'Error al actualizar la mascota.', 'type' => 'danger'];
         }
     }
+    // Redirigir para evitar reenvío de formulario y detener la ejecución del script
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -82,11 +81,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     } else {
         $_SESSION['message'] = ['text' => 'Mascota no encontrada.', 'type' => 'danger'];
     }
+    // Redirigir para limpiar la URL y detener la ejecución del script
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit();
 }
 
-// Preparar datos para la vista
+// Preparar datos para la vista (solo si no hubo redirección)
 $edit_mode = false;
 $mascota_a_editar = new Mascota($db); // Objeto limpio para el formulario
 if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
@@ -97,6 +97,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
 $lista_mascotas = $mascota->getAll();
 
 // --- FIN LÓGICA DEL CONTROLADOR ---
+
+// *** CAMBIO REALIZADO AQUÍ ***
+// El header se incluye DESPUÉS de toda la lógica de redirección, justo antes de empezar a renderizar el HTML.
+include 'layouts/header_admin.php';
 ?>
 
 <!DOCTYPE html>
