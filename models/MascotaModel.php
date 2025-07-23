@@ -100,14 +100,37 @@ class Mascota
         return $stmt->execute();
     }
 
-    public function delete()
-    {
-        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
-        $stmt = $this->conn->prepare($query);
+public function delete()
+{
+    // Iniciar una transacción
+    $this->conn->beginTransaction();
+
+    try {
+        // 1. Eliminar las referencias en log_adopciones
+        $query_log = 'DELETE FROM log_adopciones WHERE fk_mascota = :id'; // Asumiendo que la columna se llama fk_mascota
+        $stmt_log = $this->conn->prepare($query_log);
         $this->id = htmlspecialchars(strip_tags($this->id));
-        $stmt->bindParam(':id', $this->id);
-        return $stmt->execute();
+        $stmt_log->bindParam(':id', $this->id);
+        $stmt_log->execute();
+
+        // 2. Eliminar la mascota de la tabla principal
+        $query_mascota = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+        $stmt_mascota = $this->conn->prepare($query_mascota);
+        // El ID ya fue limpiado y bindeado
+        $stmt_mascota->bindParam(':id', $this->id);
+        $stmt_mascota->execute();
+
+        // Si todo fue bien, confirmar los cambios
+        $this->conn->commit();
+        return true;
+
+    } catch (PDOException $e) {
+        // Si algo falla, revertir todos los cambios
+        $this->conn->rollBack();
+        // Opcional: registrar el error $e->getMessage()
+        return false;
     }
+}
 
     private function cleanData()
     {
