@@ -1,10 +1,10 @@
 <?php
 class Database {
     // --- MODIFICA ESTOS DATOS CON LOS TUYOS ---
-    private $host = 'localhost';          // Host de PostgreSQL
-    private $db_name = 'adopcion';     // Nombre de tu base de datos
-    private $username = 'postgres';       // Tu usuario de PostgreSQL
-    private  $password = '1231';  // Tu contraseña de PostgreSQL
+    private $host = 'dpg-d20e2ni4d50c73b1p230-a.oregon-postgres.render.com';          // Host de PostgreSQL
+    private $db_name = 'adopcion_hmvb';     // Nombre de tu base de datos
+    private $username = 'adopcion_hmvb_user';       // Tu usuario de PostgreSQL
+    private  $password = '0PqYnDVvG6034tX6NVJwFbDGFtp0zEk4';  // Tu contraseña de PostgreSQL
     private $port = '5432';               // Puerto (usualmente 5432)
     // -----------------------------------------
 
