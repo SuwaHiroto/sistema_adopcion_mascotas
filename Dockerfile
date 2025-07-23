@@ -2,11 +2,12 @@
 FROM php:8.0.30-apache
 
 # Instala extensiones de PHP necesarias para PostgreSQL y otras funcionalidades
-# AÑADIMOS 'libpng-dev' A LA LISTA DE PAQUETES
+# Presta mucha atención a que NO HAYA ESPACIOS AL FINAL DE LAS LÍNEAS con '\'
+# y que no haya líneas vacías entre las partes del comando RUN.
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     zlib1g-dev \
-    libpng-dev \  # <-- ¡ESTA ES LA LÍNEA NUEVA!
+    libpng-dev \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_pgsql pgsql gd
 
