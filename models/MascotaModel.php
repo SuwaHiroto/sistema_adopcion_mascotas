@@ -102,32 +102,33 @@ class Mascota
 
 public function delete()
 {
-    // Iniciar una transacción
+    // Iniciar una transacción para asegurar que todo o nada se ejecute
     $this->conn->beginTransaction();
 
     try {
-        // 1. Eliminar las referencias en log_adopciones
-        $query_log = 'DELETE FROM log_adopciones WHERE fk_mascota = :id'; // Asumiendo que la columna se llama fk_mascota
+        // 1. Primero, eliminar los registros en la tabla dependiente (log_adopciones)
+        // Asegúrate que la columna de la mascota en log_adopciones se llame 'fk_mascota'
+        $query_log = 'DELETE FROM log_adopciones WHERE fk_mascota = :id';
         $stmt_log = $this->conn->prepare($query_log);
         $this->id = htmlspecialchars(strip_tags($this->id));
         $stmt_log->bindParam(':id', $this->id);
         $stmt_log->execute();
 
-        // 2. Eliminar la mascota de la tabla principal
+        // 2. Ahora, eliminar la mascota de la tabla principal
         $query_mascota = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
         $stmt_mascota = $this->conn->prepare($query_mascota);
-        // El ID ya fue limpiado y bindeado
         $stmt_mascota->bindParam(':id', $this->id);
         $stmt_mascota->execute();
 
-        // Si todo fue bien, confirmar los cambios
+        // Si ambas consultas fueron exitosas, confirma los cambios
         $this->conn->commit();
         return true;
 
     } catch (PDOException $e) {
-        // Si algo falla, revertir todos los cambios
+        // Si algo falló, revierte todos los cambios para no dejar datos inconsistentes
         $this->conn->rollBack();
-        // Opcional: registrar el error $e->getMessage()
+        // Opcional: puedes registrar el error en un log para depuración
+        // error_log($e->getMessage());
         return false;
     }
 }
